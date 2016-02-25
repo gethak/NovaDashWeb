@@ -62,7 +62,7 @@ namespace Nova.Admin.Services
                 new MarketShare_Result {Area = stateName, CustomersCount = totalCustomersByState}
             };
         }
-
+         
         public GenderShare_Result[] GenderShareByState(string stateName)
         {
             var totalGenderByState = from address in _context.Addresses
