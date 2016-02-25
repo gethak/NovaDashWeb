@@ -1,6 +1,6 @@
 # NovaDashWeb
 
-Getting Started.
+**Getting Started.**
 
 Please change the 'NovaAdminContext' connection string to point to your initial catalogs using:
 <add name="DefaultConnection" connectionString="Data Source={your data source};AttachDbFilename=|DataDirectory|\Nova.Admin.mdf;Initial Catalog=aspnet-NovaAdmin;Integrated Security=True" 
@@ -11,7 +11,7 @@ The Project includes several infrastructe and '*.Shell' projects which give an i
 A word on the Implementaion follows below:
 
 
-Architecture:
+**Architecture:**
 
 The system really composes of two different Usage patterns:
 1.	Services providing CRUD functions on Customer aggregate-root data, and 
@@ -25,7 +25,7 @@ If we wanted to over-engineer this, we would place the two under different Domai
 Both the above will be serviced by a Domain Services that encapsulates Domain layer logic using Repositories. I realize that this is a potential point of contention, as many feel that Repositories on top of Unit-of-Work DbContexts are redundant, however, repositories provide better Business-context than Query objects. Using the above separation of use patterns, I’d venture to say that the CRUD features are best left to Repositories whereas the faster evolving Reporting/Analytics aspect belongs in Query (IQueryable) objects, so we will have place for both in our domain Infrastructure.
 
 
-So why no MVVM in the final solution?
+**So why no MVVM in the current solution?**
 
 With the absence of a UI template, I felt the most time efficient manner to get a great UI up and running was to use a html template of some kind. Telerik has an impressive collection of UI patterns in their Kendo UI for MVC toolset. Some of these kendo components had minimal code in them, so the idea was to modify existing html to the point where all functionality was working with Nova Dash and then refactoring the events and multitude of Ajax calls into a ViewModel for use with Angular or Knockout and wrap the events inside of observables and computed observables. 
 
@@ -36,9 +36,9 @@ On a side note, the front end controllers’ implementations were made to accomm
 
 
 
-Some Design considerations:
+**Some Design considerations:**
 
-1. Domain Services layer Implementation - Implementation using Vanilla Web Api 2 or the OData flavour?
+**1. Domain Services layer Implementation - Implementation using Vanilla Web Api 2 or the OData flavour?**
 
 Cons
 - Being a Microsoft proprietary standard, it is going to have a tough time finding support in the community. (Major tech cos, including Netflix, are abandoning OData, although these are still early days)
@@ -54,8 +54,7 @@ Pros
 I'm still on the fence on this one. OData seems more geared towards browsable public  online data repositories rather than in-house business contexts with high complexity. 
 
 
-
-Change Tracking:
+**Change Tracking:**
 
 Some options I considered include
 1.	Use Entity Framework for tracking
@@ -70,12 +69,12 @@ Pros: Quick, easy, provides Audit-log details to the level of which property on 
 I don’t have a SQL Server professional licence, and since this negates the possibility of using Change Data, I decided to settle for the convenience of the EF approach for now. 
 TrackerEnabledDbContext is a tool (although this has had negative Unit testing implications) built on top of EF, that provides attribute and fluent syntax; can choose to [SkipChanges] on properties. It also API to query.
 
+**Domaon Design**
 
 I’d also just like to mention that I chose to implement ‘Address’ as an Entity is due to Entity Framework’s restrictions on Value Objects not being able to reference other entities. I felt Addresses needed to reference States and Countries for good data integrity and consistency requirements.
 
 
-
-Roadmap:
+**Roadmap:**
 
 Some crucial tools/refactoring I felt I didn’t get to implement yet:
 -	AutoMapper for mapping ViewModels to domain DTOs
