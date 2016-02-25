@@ -1,0 +1,285 @@
+﻿
+@using System.Configuration
+@using Kendo.Mvc.UI
+@using Nova.Admin.ViewModels
+@*@model IEnumerable<Nova.Admin.ViewModels.CustomerViewModel>*@
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@section JavaScript
+{
+    <script type="text/javascript" src="@Url.Content("/Scripts/LocationAnalytics/Index.js")"></script>
+}
+
+<div id="main-section-header" class="row">
+    <h2 id="team-efficiency" class="col-xs-3">MANAGE CUSTOMERS</h2>
+    <div style="clear:both;"></div>
+</div>
+
+<div id="products-customers-main-content" class="main-section-content">
+
+    <div class="autocomplete-customers-search">
+
+        @(Html.Kendo().AutoComplete()
+          .Name("customersAutoComplete")
+          .DataTextField("Name")
+          .Filter("startsWith")
+          .MinLength(2)
+          .Placeholder("Search for Customer....")
+          .IgnoreCase(true)
+          .Suggest(true)
+          .HtmlAttributes(new { style = "width: 150px; font-weight:bold" })
+          .Events(e =>
+          {
+              e.Select("customersAutoComplete_onSelect");
+              e.DataBound("customersAutoComplete_onDataBound");
+              e.Change("customersAutoComplete_onChange");
+          })
+          .DataSource(source =>
+          {
+              source.Read(read =>
+              {
+                  read.Action("GetCustomersForAutoComplete", "Customers")
+                      .Data("customersAutoComplete_onAdditionalData");
+              })
+                  .ServerFiltering(true);
+          })
+        )
+    </div>
+
+
+    @(Html.Kendo().Grid<CustomerViewModel>
+            ()
+            .Name("customers")
+            .HtmlAttributes(new { style = "height: 97%; bcustomer: 0;" })
+            .Scrollable()
+            .ToolBar(t =>
+            {
+                if (bool.Parse(ConfigurationManager.AppSettings["EditingEnabled"]))
+                {
+                    t.Create().Text("Create new Customer");
+                }
+            })
+            .Columns(columns =>
+            {
+                columns.Template(t => { })
+                .ClientTemplate("#=Id#")
+                .Title("CUSTOMER ID")
+                .Width(90);
+                columns.Bound(f => f.Name)
+                .Title("NAME")
+                .Format("{0:d}")
+                .Width(100);
+                columns.Bound(f => f.DateOfBirth)
+                .Title("DATE OF BIRTH")
+                .Format("{0:yyyy-MM-dd}")
+                .Width(150);
+                //columns.ForeignKey(f => f.Gender, null).EditorTemplateName("GridForeignKey")
+                columns.Bound(f => f.Gender)
+                .Title("GENDER")
+                .Width(100);
+                columns.Bound(f => f.Category)
+                .Title("CATEGORY")
+                .Width(100);
+                columns.Bound(f => f.AddressLine1)
+                .Title("ADDRESS LINE 1")
+                .Width(150);
+                columns.ForeignKey(f => f.CountryRegionId, (System.Collections.IEnumerable)ViewData["countries"], "Id", "Name")
+                //columns.Bound(f => f.CountryRegionName)
+                .Title("COUNTRY")
+                //.ClientTemplate("<div class='country #=CountryRegionId#'></div>#=CountryRegionId#")
+                .Width(100)
+                .EditorTemplateName("CustomGridForeignKey");
+                //columns.Bound(f => f.StateName)
+                columns.ForeignKey(f => f.StateId, (System.Collections.IEnumerable)ViewData["states"], "Id", "Name")
+                .Title("STATE")
+                .Width(100)
+                .EditorTemplateName("CustomGridForeignKey");
+                columns.Bound(f => f.IsDeleted)
+                .Title("IS DELETED")
+                .Width(100);
+                if (bool.Parse(ConfigurationManager.AppSettings["EditingEnabled"]))
+                {
+                    columns.Command(commands =>
+                    {
+                        commands.Edit();
+                        commands.Destroy();
+                    }).Width(200);
+                }
+            })
+            .Editable(e => e.Mode(GridEditMode.PopUp))
+            .Events(e =>
+            {
+                e.DataBound("onDataBound");
+                e.DetailInit("onDetailInit");
+            }
+          )
+            .Pageable(pageable => pageable.Refresh(true))
+            .Sortable()
+            .Selectable()
+            .Navigatable()
+            .Filterable()
+            .ClientDetailTemplateId("customer_DetailTemplate")
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(16)
+            .Model(m =>
+            {
+                m.Id(f => f.Id);
+            })
+            .Events(e => e.Error(@<text>
+                function (e) {
+                onError(e, "customers");
+                }
+            </text>))
+            .Sort(s => s.Add(f => f.Id).Descending())
+            .Read("Customers_Read", "Customers")
+            .Create("Customers_Create", "Customers")
+            .Update("Customers_Update", "Customers")
+            .Destroy("Customers_Destroy", "Customers")
+            )
+    )
+
+    @{
+        Func<object, object>
+            errorEvent = @<text>
+                function(e) {
+                if (e.errors) {
+                onError(e, "customer_details#=Id#");
+                }
+                }
+            </text>;
+    }
+
+
+
+<script id="customer_DetailTemplate" type="text/x-kendo-tmpl">
+        <h4>Details for customer \\##=Id# </h4>
+        @(Html.Kendo().TabStrip()
+              .Name("customer_details_tabstrip_#=Id#")
+              .Items(items =>
+              {
+                  items.Add()
+                      .Text("PRODUCTS")
+                      .Selected(true)
+                      .Content(@<text>
+                @(Html.Kendo().Grid<AuditLogViewModel>()
+                      .Name("customer_details#=Id#")
+                      .Columns(columns =>
+                      {
+                          columns.Bound(f => f.EventDateUtc)
+                              //.Format("{0:yyyy-MM-dd}")
+                              .Title("CHANGE DATE")
+                              .Width(220);
+                          columns.Bound(f => f.EventType)
+                              .Title("CHANGE TYPE")
+                              .Width(220);
+                          columns.Bound(f => f.UserName)
+                              .Title("CHANGED BY")
+                              //.Format("{0:p}")
+                              //.ClientFooterTemplate("Grand total:")
+                              .Width(220);
+                      })
+                      .Events(e =>
+                      {
+                          //e.DataBound("oncustomerDetailsDataBound");
+                          //e.DetailInit("onDetailInit");
+                          //e.Edit("oncustomerDetailsEdit");
+                      })
+                      .Selectable()
+                      //.Pageable(pageable => pageable.Refresh(true))
+                      .Navigatable()
+                      //.ClientDetailTemplateId("Product_DetailTemplate")
+                      .DataSource(dataSource => dataSource
+                          .Ajax()
+                          //.WebApi()
+                          .Model(model =>
+                          {
+                              model.Id(detail => detail.RecordId.ToString());
+                          })
+                          .Events(e => e.Error(errorEvent))
+                          //.Read("AuditLogs_Read", "Customers")
+                          .Read("AuditLogs_Read", "Customers", new {RecordId = "#=Id#"})
+                      //.Read(read => read.Url(Url.HttpRouteUrl("DefaultApi", new { controller = "AuditLogs" })))
+                      //.Read(read => read.Url("api/AuditLogs").Type(HttpVerbs.Get))
+                      ).ToClientTemplate()
+                      )</text>);
+                  items.Add()
+                      .Text("ADDRESS DETAILS")
+                      .Content(@<text>
+                <div class='shipping-details'>
+                    <ul>
+                        <li><label>House Number:</label><span class="house-number"></span></li>
+                        <li><label>Address Line 1:</label><span class="address-line-1"></span></li>
+                        <li><label>State:</label><span class="state"></span></li>
+                        <li><label>Country:</label><span class="country"></span></li>
+                    </ul>
+                </div>
+                        </text>);
+              })
+              .ToClientTemplate()
+              )
+    </script>
+
+
+
+    <script type="text/javascript">
+        function onDetailInit(e) {
+            var model = e.data;
+            var detail = e.detailRow;
+            detail.find(".house-number").text(model.HouseNumber);
+            detail.find(".address-line-1").text(model.AddressLine1);
+            detail.find(".state").text(model.StateName);
+            detail.find(".country").text(model.CountryRegionName);
+        }
+    </script>
+    <script id="Product_DetailTemplate" type="text/x-kendo-template">
+        <div id="product_detailtemplate_#=Id#" class="product-details-wrapper row">
+            <div class="product-details col-xs-2">
+                #if(Id) {#
+                <img src="@Url.Content("/Content/employees/")#=Id#.png" class="product-details-image">
+                #}#
+                <div class="product-name-cat">
+                    <div class="product-name"></div>
+                    <div class="product-category"></div>
+                </div>
+            </div>
+            <div class="product-details col-xs-2">
+                <h>Customer</h>
+                <span class="details-stock"></span>
+            </div>
+            <div class="product-details col-xs-2">
+                <h5>DateOfBirth</h5>
+                <span class="details-customers"></span>
+            </div>
+            <div class="product-details col-xs-2">
+                <h5>StateName</h5>
+                <span class="details-re-customer"></span>
+            </div>
+            <div class="product-details col-xs-2">
+                <h5>CountryRegionName</h5>
+                <span class="details-re-customer"></span>
+            </div>
+        </div>
+    </script>
+</div>
+
+<script>
+
+    $(function () {
+        var autocomplete = $("#customersAutoComplete").getKendoAutoComplete();
+
+        autocomplete.bind("filter", function (e) {
+            var filter = e.filter;
+            if (!filter.value) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $("#ProductsAndcustomers").addClass("active");
+    });
+</script>

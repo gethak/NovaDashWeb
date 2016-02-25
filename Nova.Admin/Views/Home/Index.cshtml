@@ -1,0 +1,320 @@
+﻿@using Kendo.Mvc.UI
+@using Nova.Admin.Models
+
+@section JavaScript
+    {
+    <script src="@Url.Content("~/Scripts/chroma.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("/Scripts/Home/Index.js")"></script>
+}
+
+<script>
+    var urlStateCustomersTotal = "@Url.Action("StateCustomersTotal", "LocationAnalytics")";
+</script>
+
+<div id="main-section-header" class="row">
+    <h2 id="team-efficiency" class="col-xs-3">Location Analytics</h2>
+    <div id="dateFilter" class="col-xs-9">
+        @*<div class="period-wrapper">
+                <label for="StartDate" class="select-period">Stats from</label>
+                @(Html.Kendo().DatePicker()
+                    .Name("StartDate")
+                    .Value(new DateTime(1996, 1, 1))
+                    .Events(e=>e.Change("onCriteriaChange"))
+                )
+                <span class="k-invalid-msg" data-for="StartDate"></span>
+            </div>*@
+        @*<div class="period-wrapper">
+                <label for="EndDate" class="select-period">To</label>
+                @(Html.Kendo().DatePicker()
+                      .Name("EndDate")
+                      .Value(new DateTime(1998, 8, 1))
+                      .Events(e => e.Change("onCriteriaChange"))
+                      )
+                <span class="k-invalid-msg" data-for="EndDate"></span>
+            </div>*@
+        <div class="period-wrapper">
+            @*<label for="StateAutoComplete" class="select-period"></label>*@
+            <div class="demo-section k-content">
+                @(Html.Kendo().AutoComplete()
+                      .Name("statesAutoComplete")
+                      .DataTextField("Name")
+                      .Filter("startsWith")
+                      .MinLength(2)
+                      .Placeholder("Select Location...")
+                      .IgnoreCase(true)
+                      .Suggest(true)
+                      .Events(e =>
+                      {
+                          e.Select("customersAutoComplete_onSelect");
+                          e.DataBound("customersAutoComplete_onDataBound");
+                          e.Change("customersAutoComplete_onChange");
+                      })
+                      .DataSource(source =>
+                      {
+                          source.Read(read =>
+                          {
+                              read.Action("GetStatesForAutoComplete", "LocationAnalytics")
+                                  .Data("customersAutoComplete_onAdditionalData");
+                          })
+                              .ServerFiltering(true);
+                      })
+                )
+            </div>
+
+            @*@(Html.Kendo().DatePicker()
+                    .Name("EndDate")
+                    .Value(new DateTime(1998, 8, 1))
+                    .Events(e => e.Change("onCriteriaChange"))
+                )
+                <span class="k-invalid-msg" data-for="EndDate"></span>*@
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+
+
+<div id="regional-sales" class="main-section-content row">
+    <div id="map-wrapper" class="row">
+        <div id="map-details" class="col-xs-2">
+            <h3 class="section-header">Pick a State to view analytics</h3>
+            <h3 class="section-header">STATE</h3>
+            <h2 id="countryName"></h2>
+            @*<h3 class="section-header">CUSTOMERS</h3>*@
+            <div id="countryCustomers"><span></span></div>
+        </div>
+        <div id="map-container" class="col-xs-10">
+            @(Html.Kendo().Map()
+                .Name("map")
+                .Center(50.000, -50)
+                .Zoom(2.5)
+                .Layers(layers =>
+                {
+                    layers.Add()
+                        .Style(style => style
+                            .Fill(fill => fill.Color("#1996E4"))
+                            .Stroke(stroke => stroke.Color("#FFFFFF"))
+                        )
+                        .Type(MapLayerType.Shape)
+                        .DataSource(dataSource => dataSource
+                            .GeoJson()
+                            .Read(read => read.Url(Url.Content("~/Content/countries.us.geo.json")))
+                        );
+
+
+                })
+                .Events(events => events
+                    .ShapeCreated("onShapeCreated")
+                    .ShapeMouseEnter("onShapeMouseEnter")
+                    .ShapeMouseLeave("onShapeMouseLeave")
+                    .ShapeClick("onShapeClick")
+                )
+                .Zoomable(false)
+            )
+        </div>
+    </div>
+
+    <div id="statsContainer" class="row">
+        <div id="customersContainer" class="col-xs-2 stats-graph">
+            <h3 class="section-header">Customers</h3>
+            <h1><span id="CustomersLabel"></span></h1>
+            @*<div class="sparkline-container">
+                @(Html.Kendo().Sparkline<CountryCustomers_Result>()
+                    .Name("Customers")
+                    .Theme("metro")
+                    .HtmlAttributes(new { @style="height: 100px;"})
+                    .AutoBind(false)
+                    .DataSource(ds => ds
+                        .Read(read => read.Action("GenderByState", "Customers"))
+                    )
+                    .Series(series =>
+                    {
+                        series.Column(x => x.Value).CategoryField("Date").Aggregate(ChartSeriesAggregate.Sum).Color("#1996e4").Gap(0.2);
+                    })
+                    .CategoryAxis(axis=>axis
+                        .Date()
+                        .BaseUnit(ChartAxisBaseUnit.Months)
+                    )
+                )*@
+            <div id="CustomersNoData" class="overlay">
+                <div>No data available</div>
+            </div>
+        </div>
+
+        <div id="marketShareContainer" class="col-xs-3 stats-graph">
+            <h2 class="section-header">Market share</h2>
+            <div class="sparkline-container">
+                @(Html.Kendo().Chart<MarketShare_Result>()
+                      .Name("MarketShare")
+                      .Theme("office365")
+                      .HtmlAttributes(new { @style = "height: 300px;" })
+                      .AutoBind(false)
+                      .Events(e => e.DataBound("onMarketShareDataBound"))
+                      .Legend(legend => legend
+                          .Visible(true)
+                      .Position(ChartLegendPosition.Bottom)
+                      )
+                      .DataSource(ds => ds
+                          .Read(read => read.Action("MarketShareByState", "LocationAnalytics"))
+                      )
+                      //.SeriesColors(new string[] { "#42a7ff", "#666666", "#999999", "#cccccc" })
+                      .Series(series => series.Donut("CustomersCount", "Area").StartAngle(120).Labels(labels => labels.Visible(true)
+                          .Position(ChartPieLabelsPosition.OutsideEnd)
+                          .Template("#= category # - #= kendo.format('{0:P}', percentage)#")
+                          .Background("transparent")
+                          .Align(ChartPieLabelsAlign.Circle)
+                          )
+                      )
+                      //.Tooltip(tooltip => tooltip
+                      //    .Visible(true)
+                      //    .Template("#= dataItem.category #: #= kendo.toString(dataItem.percentage, 'c2') #")
+                      //)
+                )
+                <div id="MarketShareNoData" class="overlay">
+                    <div>No data available</div>
+                </div>
+            </div>
+            @*<span id="MarketShareLabel"></span>*@
+        </div>
+        <div id="revenueContainer" class="col-xs-3 stats-graph">
+            <h2 class="section-header">Category</h2>
+            @*<span id="RevenueLabel"></span>*@
+            <div class="sparkline-container">
+                @(Html.Kendo().Chart<CategoryShare_Result>()
+                      .Name("CategoryShare")
+                      .Theme("office365")
+                      .HtmlAttributes(new { @style = "height: 300px;" })
+                      .AutoBind(false)
+                      .Events(e => e.DataBound("onCategoryShareDataBound"))
+                      .Legend(legend => legend
+                          .Visible(true)
+                           .Position(ChartLegendPosition.Bottom)
+                      )
+                      .DataSource(ds => ds
+                          .Read(read => read.Action("CategoryShareByState", "LocationAnalytics"))
+                      )
+                      .Series(series =>
+                      {
+                          series.Donut("CustomersCount", "Category").StartAngle(120).Labels(labels => labels.Visible(true)
+                              .Position(ChartPieLabelsPosition.OutsideEnd).Align(ChartPieLabelsAlign.Circle)
+                              );
+                      })
+                      //.Tooltip(tooltip => tooltip
+                      //    .Visible(true)
+                      //    .Template("#= dataItem.Category #: #= kendo.toString(dataItem.CustomersCount, 'n0') #")
+                      //)
+                )
+                <div id="RevenueNoData" class="overlay">
+                    <div>No data available</div>
+                </div>
+            </div>
+        </div>
+        <div id="customersContainer" class="col-xs-3 stats-graph">
+            <h2 class="section-header">Gender</h2>
+            <span id="customersLabel"></span>
+            <div class="sparkline-container">
+                @(Html.Kendo().Chart<GenderShare_Result>()
+                      .Name("GenderShare")
+                      .Theme("office365")
+                      .HtmlAttributes(new { @style = "height: 300px;" })
+                      .AutoBind(false)
+                      .Legend(legend => legend
+                          .Visible(true)
+                           .Position(ChartLegendPosition.Bottom)
+                      )
+                      .Events(e => e.DataBound("onGenderShareDataBound"))
+                      .DataSource(ds => ds
+                          .Read(read => read.Action("GenderShareByState", "LocationAnalytics"))
+                      )
+                      .Series(series =>
+                      {
+                          series.Donut("CustomersCount", "Gender").StartAngle(120)
+                          .Labels(labels => labels.Visible(true)
+                              .Position(ChartPieLabelsPosition.OutsideEnd).Align(ChartPieLabelsAlign.Circle));
+                      })
+                )
+                <div id="customersNoData" class="overlay">
+                    <div>No data available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*<div id="topProductsContainer">
+            <h3 class="section-header">Demographics across United States</h3>
+                    @(Html.Kendo().Sparkline<MarketShare_Result>()
+                        .Name("CustomersTotalForAllStatesByCountry")
+                        .Theme("metro")
+                        .HtmlAttributes(new { @style = "height: 130px; width:40%" })
+                        .AutoBind(false)
+                        .Events(e => e.DataBound("onTotalCustomersByAllStatesDataBound"))
+                        .DataSource(ds => ds
+                            .Read(read => read.Action("CustomersTotalForAllStatesByCountry", "LocationAnalytics"))
+                        )
+                        .Series(series =>
+                        {
+                            series.Column(x => x.CustomersCount).CategoryField("Area")
+                            .Aggregate(ChartSeriesAggregate.Sum)
+                            .Color("#1996e4").Gap(1);
+
+                        })
+                        //.CategoryAxis(axis => axis
+                        //    .Date()
+                        //    .BaseUnit(ChartAxisBaseUnit.Months)
+                        //)
+                        .Tooltip(t => t.Format("{0:n0}"))
+                    )
+
+            <div id="ProductsNoData" class="overlay"><div>No data available</div></div>
+        </div>*@
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#LocationAnalytics").addClass("active");
+            $("#dateFilter").kendoValidator({
+                rules: {
+                    startDate: function (input) {
+                        if (input.is("#StartDate")) {
+                            startDate = kendo.parseDate(input.val());
+                            endDate = kendo.parseDate($("#EndDate").val());
+                            if (startDate > endDate) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    },
+                    endDate: function (input) {
+                        if (input.is("#EndDate")) {
+                            startDate = kendo.parseDate($("#StartDate").val());
+                            endDate = kendo.parseDate(input.val());
+                            if (startDate > endDate) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    },
+                },
+                messages: {
+                    startDate: "Start date should preceed the End date.",
+                    endDate: "End date should not preceed the Start date."
+                }
+            });
+            onCriteriaChange();
+            $(window).resize(setSparkLinesWidths);
+            $(window).resize(resizeMap);
+        });
+
+        $(function () {
+            var autocomplete = $("#statesAutoComplete").getKendoAutoComplete();
+
+            autocomplete.bind("filter", function (e) {
+                var filter = e.filter;
+                if (!filter.value) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
+
+
