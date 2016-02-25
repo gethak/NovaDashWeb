@@ -8,7 +8,7 @@ Please change the 'NovaAdminContext' connection string to point to your initial 
 
 The Project includes several infrastructe and '*.Shell' projects which give an indication as to the direction of future refactor to patterns,
 
-A word on the Implementaion follows below:
+A word on the Implementation follows below:
 
 
 **Architecture:**
