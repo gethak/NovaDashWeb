@@ -36,7 +36,7 @@ On a side note, the front end controllers’ implementations were made to accomm
 
 
 
-##Some Design considerations:##
+##Some Design Considerations:##
 
 **1. Domain Services layer Implementation - Implementation using Vanilla Web Api 2 or the OData flavour?**
 
