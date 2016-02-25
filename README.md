@@ -1,6 +1,6 @@
 # NovaDashWeb
 
-**Getting Started.**
+##Getting Started.##
 
 Please change the 'NovaAdminContext' connection string to point to your initial catalogs using:
 <add name="DefaultConnection" connectionString="Data Source={your data source};AttachDbFilename=|DataDirectory|\Nova.Admin.mdf;Initial Catalog=aspnet-NovaAdmin;Integrated Security=True" 
@@ -11,16 +11,16 @@ The Project includes several infrastructe and '*.Shell' projects which give an i
 A word on the Implementation follows below:
 
 
-**Architecture:**
+##Architecture:##
 
 The system really composes of two different Usage patterns:
-1.	Services providing CRUD functions on Customer aggregate-root data, and 
-2.	Read-only reporting/analytics services on top of the above Customer data. 
+1. Services providing CRUD functions on Customer aggregate-root data, and 
+2. Read-only reporting/analytics services on top of the above Customer data. 
 
 If we wanted to over-engineer this, we would place the two under different Domain Contexts with their own DDD implementations. If we were to further exaggerate the use characteristics on these individual services, the CQRS pattern comes to mind as a potential candidate. This would never be a practical solution in real terms for a project of the current nature. I do think it is appropriate to separate the front-end patterns for each of the above usage patterns. In particular, our architecture will comprise of :
 
-1.	A plain vanilla MVC front-end providing CRUD features to leverage ASP.NET’s support for Data Annotations (and in turn scaffolding), and
-2.	A rich Angular/Knockout MVVM Location Analytics page services by a wep api.
+1. A plain vanilla MVC front-end providing CRUD features to leverage ASP.NET’s support for Data Annotations (and in turn scaffolding), and
+2. A rich Angular/Knockout MVVM LocationAnalytics page serviced by a wep api.
 
 Both the above will be serviced by a Domain Services that encapsulates Domain layer logic using Repositories. I realize that this is a potential point of contention, as many feel that Repositories on top of Unit-of-Work DbContexts are redundant, however, repositories provide better Business-context than Query objects. Using the above separation of use patterns, I’d venture to say that the CRUD features are best left to Repositories whereas the faster evolving Reporting/Analytics aspect belongs in Query (IQueryable) objects, so we will have place for both in our domain Infrastructure.
 
@@ -36,7 +36,7 @@ On a side note, the front end controllers’ implementations were made to accomm
 
 
 
-**Some Design considerations:**
+##Some Design considerations:##
 
 **1. Domain Services layer Implementation - Implementation using Vanilla Web Api 2 or the OData flavour?**
 
@@ -69,7 +69,7 @@ Pros: Quick, easy, provides Audit-log details to the level of which property on 
 I don’t have a SQL Server professional licence, and since this negates the possibility of using Change Data, I decided to settle for the convenience of the EF approach for now. 
 TrackerEnabledDbContext is a tool (although this has had negative Unit testing implications) built on top of EF, that provides attribute and fluent syntax; can choose to [SkipChanges] on properties. It also API to query.
 
-**Domaon Design**
+**Domain Design**
 
 I’d also just like to mention that I chose to implement ‘Address’ as an Entity is due to Entity Framework’s restrictions on Value Objects not being able to reference other entities. I felt Addresses needed to reference States and Countries for good data integrity and consistency requirements.
 
