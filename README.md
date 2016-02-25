@@ -3,7 +3,7 @@
 ##Getting Started.##
 
 Please change the 'NovaAdminContext' connection string to point to your initial catalogs using:
-&lt;add name="DefaultConnection" connectionString="Data Source={your data source};AttachDbFilename=|DataDirectory|\Nova.Admin.mdf;Initial Catalog=aspnet-NovaAdmin;Integrated Security=True" 
+&lt;add name="DefaultConnection" connectionString="Data Source={your data source};AttachDbFilename=|DataDirectory|\Nova.Admin.mdf;Initial Catalog=NovaAdmin;Integrated Security=True" 
     providerName="System.Data.SqlClient" />
 
 The Project includes several infrastructe and '*.Shell' projects which give an indication as to the direction of future refactor to patterns,
