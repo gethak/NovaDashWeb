@@ -43,7 +43,7 @@ Both the above will be serviced by a Domain Services API that encapsulates Domai
 
 **So why no MVVM in the current solution?**
 
-With the absence of a UI template, I felt the most time efficient manner to get a great UI up and running was to use a html template of some kind. Telerik has an impressive collection of UI patterns in their Kendo UI for MVC toolset. Some of these kendo components had minimal code in them, so the idea was to modify existing html to the point where all functionality was working with Nova Dash and then refactoring the events and multitude of Ajax calls into a ViewModel for use with Angular or Knockout and wrap the events inside of observables and computed observables. 
+With the absence of Html source, I felt the most time efficient manner to get a great UI up and running was to use a html template of some kind. Telerik has an impressive collection of UI patterns in their Kendo UI for MVC toolset. Some of these kendo components had minimal code in them, so the idea was to modify existing html to the point where all functionality was working with Nova Dash and then refactoring the events and multitude of Ajax calls into a ViewModel for use with Angular or Knockout and wrap the events inside of observables and computed observables. 
 
 On a side note, the front end controllers’ implementations were made to accommodate Telerik conventions, such as 
 1.	thier DataSourceRequest and DataSourceResponse formats, 
