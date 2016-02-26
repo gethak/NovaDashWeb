@@ -38,16 +38,16 @@ If we wanted to over-engineer this, we would place the two under different Domai
 1. A plain vanilla MVC front-end providing CRUD features to leverage ASP.NET’s support for Data Annotations (and in turn scaffolding), and
 2. A rich Angular/Knockout MVVM LocationAnalytics page that is serviced by a Wep Api.
 
-Both the above will be serviced by a Domain Services API that encapsulates Domain layer logic using Repositories. I realize that this is a potential point of contention, as many feel that Repositories on top of Unit-of-Work DbContexts are redundant, however, repositories do provide better Business-context than Query objects. Using the above separation of usage patterns, I’d venture to say that the CRUD features are best left to Repositories whereas the faster evolving Reporting/Analytics aspect belongs in Query (IQueryable) objects, so we will have place for both in our domain Infrastructure.
+Both the above will be serviced by a Domain Services API that encapsulates Domain layer logic using Repositories. I realize that this is a potential point of contention, as many feel that Repositories on top of DbContexts providing the Unit-of-Work pattern are redundant, however, I feel repositories do provide better business-context than Query objects. Using the above separation of usage patterns, I’d venture to say that the CRUD features are best left to Repositories whereas the faster evolving Reporting/Analytics aspect belongs in Query (IQueryable) objects, so we will have place for both in our domain Infrastructure.
 
 
 **So why no MVVM in the current solution?**
 
-With the absence of Html source, I felt the most time efficient manner to get a great UI up and running was to use a html template of some kind. Telerik has an impressive collection of UI patterns in their Kendo UI for MVC toolset. Some of these kendo components had minimal code in them, so the idea was to modify existing html to the point where all functionality was working with Nova Dash and then refactoring the events and multitude of Ajax calls into a ViewModel for use with Angular or Knockout and wrap the events inside of observables and computed observables. 
+With the absence of Html source, I felt the most time efficient manner to get a great UI up and running was to use a html template of some kind. Telerik has an impressive collection of UI patterns in their Kendo UI for MVC toolset. Some of these kendo components had minimal code in them, so the idea was to modify existing html templates to the point where all functionality was working with Nova Dash, and then to refactor the events and multitude of Ajax calls into a ViewModel for use with Angular or Knockout, and wrap these events inside of ViewModel observables and computed observables. 
 
 On a side note, the front end controllers’ implementations were made to accommodate Telerik conventions, such as 
 1.	thier DataSourceRequest and DataSourceResponse formats, 
-2.	the use of MVc unsupported $inlineCount and $format OData operators, and 
+2.	the use of MVC unsupported $inlineCount and $format OData operators, and 
 3.	their default use of JSONP
 
 
@@ -87,13 +87,13 @@ TrackerEnabledDbContext is a tool (although this has had negative Unit testing i
 
 **Domain Design**
 
-I’d also just like to mention that I chose to implement ‘Address’ as an Entity is due to Entity Framework’s restrictions on Value Objects not being able to reference other entities. I felt Addresses needed to reference States and Countries for good data integrity and consistency requirements.
+I’d also just like to mention that I chose to implement ‘Address’ as an Entity and not as a Value Object only due to Entity Framework’s restrictions on Value Objects not being able to reference other entities. I felt Addresses needed to reference States and Countries for good data integrity and consistency requirements.
 
 
 **Roadmap:**
 
 Some crucial tools/refactoring I felt I didn’t get to implement yet:
--	AutoMapper for mapping ViewModels to domain DTOs
+-	AutoMapper for mapping ViewModels to domain DTOs and vice-versa
 -	LESS, Typescript
 -	Refactoring the DAL code from the CustomerService and LocationAnalyticsService types in the front-end project into the Nova.Admin.Domain.Services api layer.
 
