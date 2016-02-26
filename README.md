@@ -1,5 +1,12 @@
 # NovaDashWeb
 
+Screenshots for the Nova Dash Web application's front-end UI can be found at
+
+https://raw.githubusercontent.com/gethak/NovaDashWeb/master/NovaAdmin.-.Home.png
+and 
+https://raw.githubusercontent.com/gethak/NovaDashWeb/master/NovaAdmin.-.Customers.png
+
+
 ##Getting Started.##
 
 Creating and connecting to a Database:
