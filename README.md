@@ -33,12 +33,12 @@ The system really composes of two different Usage patterns:
 1. Services providing CRUD functions on Customer aggregate-root data, and 
 2. Read-only reporting/analytics services on top of the above Customer data. 
 
-If we wanted to over-engineer this, we would place the two under different Domain Contexts with their own DDD implementations. If we were to further exaggerate the use characteristics on these individual services, the CQRS pattern comes to mind as a potential candidate. This would never be a practical solution in real terms for a project of the current nature. I do think it is appropriate to separate the front-end patterns for each of the above usage patterns. In particular, our architecture will comprise of :
+If we wanted to over-engineer this, we would place the two under different Domain Contexts with their own DDD implementations. If we were to further exaggerate the use characteristics on these individual services, the CQRS pattern comes to mind as a potential candidate. This is far from a practical solution in real terms for a project of the current nature. I do think it is appropriate to separate the front-end patterns for each of the above usage patterns. In particular, our architecture will comprise of :
 
 1. A plain vanilla MVC front-end providing CRUD features to leverage ASP.NET’s support for Data Annotations (and in turn scaffolding), and
-2. A rich Angular/Knockout MVVM LocationAnalytics page serviced by a wep api.
+2. A rich Angular/Knockout MVVM LocationAnalytics page that is serviced by a Wep Api.
 
-Both the above will be serviced by a Domain Services that encapsulates Domain layer logic using Repositories. I realize that this is a potential point of contention, as many feel that Repositories on top of Unit-of-Work DbContexts are redundant, however, repositories provide better Business-context than Query objects. Using the above separation of use patterns, I’d venture to say that the CRUD features are best left to Repositories whereas the faster evolving Reporting/Analytics aspect belongs in Query (IQueryable) objects, so we will have place for both in our domain Infrastructure.
+Both the above will be serviced by a Domain Services API that encapsulates Domain layer logic using Repositories. I realize that this is a potential point of contention, as many feel that Repositories on top of Unit-of-Work DbContexts are redundant, however, repositories do provide better Business-context than Query objects. Using the above separation of usage patterns, I’d venture to say that the CRUD features are best left to Repositories whereas the faster evolving Reporting/Analytics aspect belongs in Query (IQueryable) objects, so we will have place for both in our domain Infrastructure.
 
 
 **So why no MVVM in the current solution?**
