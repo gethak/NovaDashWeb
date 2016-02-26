@@ -2,10 +2,21 @@
 
 ##Getting Started.##
 
-Please change the **'NovaAdminContext'** and **'DefaultConnection'** connections strings in the **Nova.Admin** project's **Web.config** file:
-</br>&lt;add name="DefaultConnection" connectionString="Data Source={your data source};AttachDbFilename=|DataDirectory|NovaAdmin.mdf;Initial Catalog=NovaAdmin;Integrated Security=True" 
-    providerName="System.Data.SqlClient" />
-</br>&lt;add name="NovaAdminContext" connectionString="Data Source={your data source}; Initial Catalog=NovaAdmin; Integrated Security=True; MultipleActiveResultSets=True; AttachDbFilename=|DataDirectory|NovaAdmin.mdf" providerName="System.Data.SqlClient" />
+Creating and connecting to a Database:
+
+There are two possible ways to set up the database: 
+
+1. This is the easier option. Please run the database script called 'Create NovaAdmin RC7.sql' under the AppData folder, and then point the database connection strings to use 'NovaAdmin' as the 'Initial Catalog', for example:
+    &lt;add name="DefaultConnection" connectionString="Data Source=YourSqlServerInstanceName;Initial Catalog=NovaAdmin;Integrated Security=True" providerName="System.Data.SqlClient" />
+    &lt;add name="NovaAdminContext" connectionString="Data Source=YourSqlServerInstanceName; Initial Catalog=NovaAdmin; Integrated Security=True; MultipleActiveResultSets=True;" providerName="System.Data.SqlClient" />
+
+or 
+
+2. If you have SQL Server LocalDB installed, then you will find that the 'Nova.Admin' project's  'App_Data' folder has a database MDF file called 'NovaAdmin.MDF'. When you run the Nova.Admin project, the application will automatically attach this MDF file to the LocalDb SQL instance. Therefore, no additional scripts or any other setup needs to be run. The connection string the Nova.Admin project's Web.Config folder will then look like: 
+&lt;add name="DefaultConnection" connectionString="Data Source=(localdb)\v11.0; AttachDbFilename=|DataDirectory|NovaAdmin.mdf; Initial Catalog=NovaAdmin; Integrated Security=True; MultipleActiveResultSets=True; " providerName="System.Data.SqlClient" />
+    &lt;add name="NovaAdminContext" connectionString="Data Source=(localdb)\v11.0; AttachDbFilename=|DataDirectory|NovaAdmin.mdf; Initial Catalog=NovaAdmin; Integrated Security=True; MultipleActiveResultSets=True; " providerName="System.Data.SqlClient" />
+
+
 
 The Project includes several infrastructure and '*.Shell' projects which give an indication as to the direction of future refactor to patterns,
 
