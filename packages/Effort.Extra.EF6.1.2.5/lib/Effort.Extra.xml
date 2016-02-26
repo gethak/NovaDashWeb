@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Effort.Extra</name>
+    </assembly>
+    <members>
+        <member name="T:Effort.Extra.ObjectData">
+            <summary>
+            An object used to create and access collections of entities.
+            </summary>
+        </member>
+        <member name="M:Effort.Extra.ObjectData.#ctor(Effort.Extra.TableNamingStrategy)">
+            <summary>
+            Initialises a new instance of <c>ObjectData</c>.
+            </summary>
+            <param name="tableNamingStrategy">
+            The strategy to use when creating default table names.
+            </param>
+        </member>
+        <member name="M:Effort.Extra.ObjectData.Table``1(System.String)">
+            <summary>
+            Returns the table specified by name. If a table with the specified name does not already exist, it will be created.
+            </summary>
+            <typeparam name="T">The type of entity that the table should contain.</typeparam>
+            <param name="tableName">
+            Name of the table.
+            <remarks>
+            If this value is null then the name of the entity will be used.
+            </remarks>
+            </param>
+            <returns>The existing table with the specified name, if it exists. Otherwise, a new table will be created.</returns>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the table exists, but the element type specified is incorrect.
+            </exception>
+            <example>
+            <code language="c#">
+            public class Fella
+            {
+                public string Name { get; set; }
+            }
+            ...
+            var data = new ObjectData();
+            var table = data.Table&lt;Fella&gt;();
+            table.Add(new Fella { Name = "Fred" });
+            table.Add(new Fella { Name = "Jeff" });
+            foreach (var fella in data.Table&lt;Fella&gt;())
+            {
+                Debug.Print(fella.Name);
+            }
+            // prints:
+            // Fred
+            // Jeff
+            </code>
+            </example>
+        </member>
+        <member name="T:Effort.Extra.ObjectDataCollection">
+            <summary>
+            A keyed collection for ObjectData
+            </summary>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataCollection.GetKeyForItem(Effort.Extra.ObjectData)">
+            <summary>
+            Extracts the key from the specified element.
+            </summary>
+            <param name="item">The element from which to extract the key.</param>
+            <returns>
+            The key for the specified element.
+            </returns>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataCollection.AddOrUpdate(Effort.Extra.ObjectData)">
+            <summary>
+            If the data already exists in the collection then it is updated, otherwise it is added.
+            </summary>
+            <param name="data">The data.</param>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataCollection.TryGetValue(System.Guid,Effort.Extra.ObjectData@)">
+            <summary>
+            Tries to get the value.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="data">The data.</param>
+            <returns><c>true</c>, if the key exists, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="T:Effort.Extra.ObjectDataLoader">
+            <summary>
+            An implementation of <c>IDataLoader</c> for <c>ObjectData</c>.
+            </summary>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataLoader.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Effort.Extra.ObjectDataLoader"/> class.
+            </summary>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataLoader.#ctor(Effort.Extra.ObjectData)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Effort.Extra.ObjectDataLoader"/> class.
+            </summary>
+            <param name="data">The data.</param>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataLoader.CreateTableDataLoaderFactory">
+            <summary>
+            Creates a table data loader factory.
+            </summary>
+            <returns>
+            A table data loader factory.
+            </returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">
+            Thrown if no object data with a key matching the <see cref="P:Effort.Extra.ObjectDataLoader.Argument"/> is held in the <see cref="F:Effort.Extra.ObjectDataLoader.DataCollection"/>.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the <see cref="P:Effort.Extra.ObjectDataLoader.Argument"/> is not a valid <see cref="T:System.Guid"/>.
+            </exception>
+        </member>
+        <member name="P:Effort.Extra.ObjectDataLoader.Argument">
+            <summary>
+            Gets or sets the argument that describes the complete state of the data loader.
+            </summary>
+            <value>
+            The argument.
+            </value>
+        </member>
+        <member name="T:Effort.Extra.ObjectDataLoaderFactory">
+            <summary>
+            Implementation of <see cref="T:Effort.DataLoaders.ITableDataLoaderFactory"/> for <see cref="T:Effort.Extra.ObjectData"/>.
+            </summary>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataLoaderFactory.#ctor(Effort.Extra.ObjectData)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Effort.Extra.ObjectDataLoaderFactory"/> class.
+            </summary>
+            <param name="data">The data.</param>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataLoaderFactory.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:Effort.Extra.ObjectDataLoaderFactory.CreateTableDataLoader(Effort.DataLoaders.TableDescription)">
+            <summary>
+            Creates a data loader for the specified table.
+            </summary>
+            <param name="table">The metadata of the table.</param>
+            <returns>
+            The data loader for the table.
+            </returns>
+        </member>
+        <member name="T:Effort.Extra.TableNamingStrategy">
+            <summary>
+            The strategy to use when generating default table names.
+            </summary>
+        </member>
+        <member name="F:Effort.Extra.TableNamingStrategy.Singularised">
+            <summary>
+            Default table names should be the singularised entity type name.
+            </summary>
+        </member>
+        <member name="F:Effort.Extra.TableNamingStrategy.Pluralised">
+            <summary>
+            Default table names should be the pluralised entity type name.
+            </summary>
+        </member>
+        <member name="F:Effort.Extra.TableNamingStrategy.EntityName">
+            <summary>
+            Default tabe names should be the entity type name.
+            </summary>
+        </member>
+    </members>
+</doc>
