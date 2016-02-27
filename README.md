@@ -73,14 +73,15 @@ I'm still on the fence on this one. OData seems more geared towards browsable pu
 **Change Tracking:**
 
 Some options I considered include
-1.	Use Entity Framework for tracking
+<br/>1.	Use Entity Framework for tracking
 Cons:  Only knows abt EF changes, so a tracking system implemented using EF will be oblivious to changes made to a record by Stores Procs, ADO.NET or manual query.
 Pros: Quick, easy, provides Audit-log details to the level of which property on a record was changed and by whom.
-2.	Use Sql built-in change tracking: 
-    - varieties: 1. Change Data (async, using log files) and 2. Change Tracking. (sync, bad performance, inconsistent data states, needs Snapshot Isolation level)
-    - both varieties seem oriented towards Sync framework (to data warehouses). 
-    - Change Data is not available for SQL Express. 
-3.	Triggers require logic to dervie what was modified, as they simply make copies of entire records 
+<br/>2. Use Sql built-in change tracking: (two varieties)
+<br/>    - a. Change Data (async, using log files) and 
+<br/>    - b. Change Tracking. (sync, bad performance, inconsistent data states, needs Snapshot Isolation level)
+<br/>   - both varieties seem oriented towards Sync framework (to data warehouses). 
+<br/>   - Change Data is not available for SQL Express. 
+<br/>3.	Triggers require us writing logic to derive what was modified, as they simply make copies of entire records
 
 I don’t have a SQL Server professional licence, and since this negates the possibility of using Change Data, I decided to settle for the convenience of the EF approach for now. 
 TrackerEnabledDbContext is a tool (although this has had negative Unit testing implications) built on top of EF, that provides attribute and fluent syntax; can choose to [SkipChanges] on properties. It also API to query.
